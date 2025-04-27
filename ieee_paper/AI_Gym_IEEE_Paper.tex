@@ -33,34 +33,35 @@ Physical exercise is a crucial component of maintaining overall health and welln
 The fitness industry has responded with technologies including wearable devices, specialized equipment with embedded sensors, and mobile applications with pre-recorded workout videos. These solutions often lacked personalization, real-time feedback, and form correction capabilities that a human trainer would provide. Additionally, specialized fitness equipment can be prohibitively expensive for many users, limiting accessibility to effective training resources.
 
 Recent advancements in computer vision and deep learning have created opportunities to develop intelligent systems that can automatically track human movements, classify exercises, and provide real-time feedback on form. This paper introduces AI Gym, a system that leverages pose estimation technology and deep learning to detect, classify, and monitor exercise movements using only a standard webcam. The system was designed to be accessible, requiring minimal equipment and setup, while providing valuable feedback comparable to that of a personal trainer.
+\begin{figure}[htbp]
+
+\end{figure}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.4\textwidth]{images/mediapipe_landmarks.png}
-    \caption{MediaPipe Pose Estimation Landmark Detection. The image shows the 33 keypoints tracked by MediaPipe, including facial landmarks (0-10), torso and limb landmarks (11-16), and lower body joints (23-28). These landmarks provide the foundation for our exercise analysis by capturing the full skeletal structure during movement.}
+    \caption{MediaPipe Pose Estimation Landmark Detection}
     \label{fig:mediapipe_landmarks}
 \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/class_distribution.png}
-    \caption{Exercise Class Distribution in Training Dataset. This visualization shows the balanced distribution of exercise samples used for training our model. A balanced dataset helps prevent bias toward any particular exercise type and improves generalization across different movements. In our implementation, we focused on push-ups and squats as the primary exercise categories.}
-    \label{fig:class_distribution_detail}
-\end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
-    \caption{Confusion Matrix of Exercise Classification Performance. The matrix displays the classification accuracy for each exercise type, with darker diagonal elements indicating higher correct classification rates. This visualization helps identify which exercises might be challenging for the model to distinguish. Our system achieves high accuracy in differentiating between push-ups and squats (the main focus of our implementation), with minimal confusion between these categories.}
-    \label{fig:confusion_matrix_detail}
-\end{figure}
+The system uses MediaPipe's pose estimation to detect 33 keypoints, as shown in Figure \ref{fig:mediapipe_landmarks}. These include facial landmarks (0-10), torso and limb landmarks (11-16), and lower body joints (23-28). These landmarks provide the foundation for exercise analysis by capturing the full skeletal structure during movement.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/normalization_effect.png}
-    \caption{Effect of Pose Normalization on Feature Extraction. The left side shows raw pose coordinates which vary with user position and size, while the right demonstrates our normalization technique that centers and scales coordinates relative to body proportions. This normalization is crucial for making the system invariant to user position, camera angle, and body type, enabling consistent performance across different users and environments.}
-    \label{fig:normalization}
-\end{figure}
+
+
+
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
+%     \caption{Confusion Matrix of Exercise Classification Performance}
+%     \label{fig:confusion_matrix}
+% \end{figure}
+
+% As demonstrated in Figure \ref{fig:confusion_matrix}, the matrix displays the classification accuracy for each exercise type, with darker diagonal elements indicating higher correct classification rates. This visualization helps identify which exercises might be challenging for the model to distinguish. Our system achieves high accuracy in differentiating between push-ups and squats, with minimal confusion between these categories.
+
+
 
 \subsection{Literature Survey}
 Human activity recognition using computer vision has evolved significantly over the past decades. Early approaches relied on handcrafted features extracted from video data to classify human activities \cite{aggarwal2011}. These methods typically involved background subtraction, motion history images, and spatio-temporal interest points to capture human movements, but struggled with variations in lighting, viewpoint, and subject appearance.
@@ -84,15 +85,36 @@ Third, extracted landmarks undergo feature normalization through the PoseFeature
 
 Fourth, the normalized features are passed to a TensorFlow Lite model that classifies the current exercise. The initial implementation focuses on two primary exercises (push-ups and squats), with the ActivityClassifier using majority voting over a sliding window to provide stable classification results.
 \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.0\textwidth]{images/class_distribution.png}
+    \caption{Exercise Class Distribution in Training Dataset}
+    \label{fig:class_distribution}
+\end{figure}
+
+Figure \ref{fig:class_distribution} shows the balanced distribution of exercise samples used for training our model. A balanced dataset helps prevent bias toward any particular exercise type and improves generalization across different movements. In our implementation, we focused on push-ups and squats as the primary exercise categories.
+
+
+\begin{figure}[htbp]
     
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/classification_vis_300.png}
-    \caption{Real-time Exercise Classification with Pose Estimation Overlay. The visualization shows the system's ability to detect and track body landmarks during exercise execution. The skeletal overlay (blue lines) connects key joints, while the exercise type is displayed in the upper corner. This real-time feedback helps users understand how the system is interpreting their movements and provides immediate classification results.}
+    \caption{Real-time Exercise Classification with Pose Estimation Overlay}
     \label{fig:classification_vis}
 \end{figure}
+
+As shown in Figure \ref{fig:classification_vis}, the visualization demonstrates the system's ability to detect and track body landmarks during exercise execution. The skeletal overlay (blue lines) connects key joints, while the exercise type is displayed in the upper corner. This real-time feedback helps users understand how the system is interpreting their movements.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/biomechanics_vis_300.png}
+    \caption{Biomechanical Analysis of Exercise Form with Joint Angle Tracking}
+    \label{fig:biomechanics_vis}
+\end{figure}
+
+Figure \ref{fig:biomechanics_vis} demonstrates the system's ability to analyze exercise form by measuring critical joint angles. For push-ups, the system monitors elbow angles (shown in green) and hip alignment. For squats, knee angle and torso position are tracked. These angle measurements drive both the repetition counting state machine and form feedback mechanisms.
 
 Fifth, the RepetitionCounter class implements a state machine approach for each exercise type, tracking transitions between defined states (e.g., "up" and "down" positions). For push-ups, the system monitors elbow angles (90$^\circ$ to 160$^\circ$) and hip alignment (greater than 160$^\circ$ for proper form), while for squats, knee angles (90$^\circ$ to 170$^\circ$) are the primary tracking metric.
 
@@ -100,19 +122,14 @@ Finally, the ExerciseVisualizer renders real-time feedback elements, including a
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/biomechanics_vis_300.png}
-    \caption{Biomechanical Analysis of Exercise Form with Joint Angle Tracking. This figure demonstrates the system's ability to analyze exercise form by measuring critical joint angles. For push-ups, the system monitors elbow angles (shown in green) and hip alignment. For squats, knee angle and torso position are tracked. These angle measurements drive both the repetition counting state machine and form feedback mechanisms, enabling precise assessment of exercise quality.}
-    \label{fig:biomechanics_vis}
-\end{figure}
-
-The pipeline operates in real-time, with frame rates between 12-28 FPS depending on hardware capabilities, providing immediate feedback as users perform exercises.
-
-\begin{figure}[htbp]
-    \centering
     \includegraphics[width=0.75\textwidth]{images/training_history.png}
-    \caption{Model Training and Validation Metrics Over Epochs. This graph shows the progression of model accuracy and loss during training. The steady improvement in validation accuracy (reaching over 90\%) with minimal gap between training and validation curves indicates effective learning without overfitting. The convergence pattern demonstrates that our normalization approach and model architecture successfully capture the essential features of each exercise type while generalizing well to unseen data.}
+    \caption{Model Training and Validation Metrics Over Epochs}
     \label{fig:training_history}
 \end{figure}
+
+The training progress is visualized in Figure \ref{fig:training_history}. The graph shows steady improvement in validation accuracy (reaching over 90\%) with minimal gap between training and validation curves, indicating effective learning without overfitting. The convergence pattern demonstrates that our normalization approach and model architecture successfully capture the essential features.
+
+The pipeline operates in real-time, with frame rates between 12-28 FPS depending on hardware capabilities, providing immediate feedback as users perform exercises.
 
 \subsection{Contribution/Objectives}
 The primary contributions of this research are:
@@ -345,16 +362,20 @@ where $E_t$ is the error at time $t$, and weights $w_t$ are assigned based on th
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/classification_metrics.png}
-    \caption{Exercise Classification Performance Metrics by Category. This bar chart presents precision, recall, and F1-scores for each exercise type. These metrics provide a comprehensive view of classification performance beyond simple accuracy. The high F1-scores for push-ups and squats (above 0.90) demonstrate the system's reliability in recognizing these exercises correctly, which is essential for providing accurate form feedback.}
+    \caption{Exercise Classification Performance Metrics by Category}
     \label{fig:classification_metrics}
 \end{figure}
+
+Figure \ref{fig:classification_metrics} presents precision, recall, and F1-scores for each exercise type. These metrics provide a comprehensive view of classification performance beyond simple accuracy. The high F1-scores for push-ups and squats (above 0.90) demonstrate the system's reliability in recognizing these exercises correctly.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
-    \caption{Confusion Matrix of Exercise Classification Results. This visualization shows the relationship between predicted and actual exercise classes. The strong diagonal elements indicate high classification accuracy, while any off-diagonal elements would represent misclassifications. The clear distinction between push-ups and squats confirms the system's ability to correctly identify these exercises, which is fundamental to providing exercise-specific form analysis.}
-    \label{fig:confusion_matrix}
+    \caption{Confusion Matrix of Exercise Classification Results}
+    \label{fig:confusion_matrix_final}
 \end{figure}
+
+The final confusion matrix in Figure \ref{fig:confusion_matrix_final} shows the relationship between predicted and actual exercise classes. The strong diagonal elements indicate high classification accuracy, while any off-diagonal elements represent misclassifications. The clear distinction between push-ups and squats confirms the system's ability to correctly identify these exercises.
 
 \section{Implementation}
 
@@ -403,6 +424,14 @@ To improve stability and prevent false positives from momentary detection errors
 where $n$ is the buffer size (5 in our implementation).
 
 \subsection{Visualization Components}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/normalization_effect.png}
+    \caption{Effect of Pose Normalization on Feature Extraction}
+    \label{fig:normalization}
+\end{figure}
+
+Figure \ref{fig:normalization} illustrates the normalization process. The left side shows raw pose coordinates which vary with user position and size, while the right demonstrates our normalization technique that centers and scales coordinates relative to body proportions. This normalization is crucial for making the system invariant to user position, camera angle, and body type.
 The ExerciseVisualizer class implements several feedback mechanisms:
 
 1) Progress bar: A vertical bar showing the current position within the exercise range of motion, calculated by mapping joint angles to percentage values (e.g., knee angle from 90$^\circ$ to 170$^\circ$ maps to 0-100\% for squats).
@@ -505,6 +534,7 @@ For form analysis, the system achieved an average accuracy of 90.8\% in detectin
 \end{center}
 \end{table}
 
+
 \subsection{Training Performance and Model Generalization}
 The training process demonstrated good convergence with the model achieving 88.5\% training accuracy and 92.7\% validation accuracy on our exercise classification task.
 
@@ -601,31 +631,39 @@ Recent advancements in computer vision and deep learning have created opportunit
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/mediapipe_landmarks.png}
-    \caption{MediaPipe Pose Estimation Landmark Detection. The image shows the 33 keypoints tracked by MediaPipe, including facial landmarks (0-10), torso and limb landmarks (11-16), and lower body joints (23-28). These landmarks provide the foundation for our exercise analysis by capturing the full skeletal structure during movement.}
+    \includegraphics[width=0.4\textwidth]{images/mediapipe_landmarks.png}
+    \caption{MediaPipe Pose Estimation Landmark Detection}
     \label{fig:mediapipe_landmarks}
 \end{figure}
+
+The system uses MediaPipe's pose estimation to detect 33 keypoints, as shown in Figure \ref{fig:mediapipe_landmarks}. These include facial landmarks (0-10), torso and limb landmarks (11-16), and lower body joints (23-28). These landmarks provide the foundation for exercise analysis by capturing the full skeletal structure during movement.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/class_distribution.png}
-    \caption{Exercise Class Distribution in Training Dataset. This visualization shows the balanced distribution of exercise samples used for training our model. A balanced dataset helps prevent bias toward any particular exercise type and improves generalization across different movements. In our implementation, we focused on push-ups and squats as the primary exercise categories.}
-    \label{fig:class_distribution_detail}
+    \caption{Exercise Class Distribution in Training Dataset}
+    \label{fig:class_distribution}
 \end{figure}
+
+Figure \ref{fig:class_distribution} shows the balanced distribution of exercise samples used for training our model. A balanced dataset helps prevent bias toward any particular exercise type and improves generalization across different movements. In our implementation, we focused on push-ups and squats as the primary exercise categories.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
-    \caption{Confusion Matrix of Exercise Classification Performance. The matrix displays the classification accuracy for each exercise type, with darker diagonal elements indicating higher correct classification rates. This visualization helps identify which exercises might be challenging for the model to distinguish. Our system achieves high accuracy in differentiating between push-ups and squats (the main focus of our implementation), with minimal confusion between these categories.}
-    \label{fig:confusion_matrix_detail}
+    \caption{Confusion Matrix of Exercise Classification Performance}
+    \label{fig:confusion_matrix}
 \end{figure}
+
+As demonstrated in Figure \ref{fig:confusion_matrix}, the matrix displays the classification accuracy for each exercise type, with darker diagonal elements indicating higher correct classification rates. This visualization helps identify which exercises might be challenging for the model to distinguish. Our system achieves high accuracy in differentiating between push-ups and squats, with minimal confusion between these categories.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/normalization_effect.png}
-    \caption{Effect of Pose Normalization on Feature Extraction. The left side shows raw pose coordinates which vary with user position and size, while the right demonstrates our normalization technique that centers and scales coordinates relative to body proportions. This normalization is crucial for making the system invariant to user position, camera angle, and body type, enabling consistent performance across different users and environments.}
+    \caption{Effect of Pose Normalization on Feature Extraction}
     \label{fig:normalization}
 \end{figure}
+
+Figure \ref{fig:normalization} illustrates the normalization process. The left side shows raw pose coordinates which vary with user position and size, while the right demonstrates our normalization technique that centers and scales coordinates relative to body proportions. This normalization is crucial for making the system invariant to user position, camera angle, and body type.
 
 \subsection{Literature Survey}
 Human activity recognition using computer vision has evolved significantly over the past decades. Early approaches relied on handcrafted features extracted from video data to classify human activities \cite{aggarwal2011}. These methods typically involved background subtraction, motion history images, and spatio-temporal interest points to capture human movements, but struggled with variations in lighting, viewpoint, and subject appearance.
@@ -648,36 +686,57 @@ Second, MediaPipe's pose model processes each frame to extract 33 3D body keypoi
 Third, extracted landmarks undergo feature normalization through the PoseFeatureExtractor class. This process centers the coordinates around the body's center of gravity and scales them by torso height, creating pose features that remain consistent regardless of user position, distance from camera, or body proportions.
 
 Fourth, the normalized features are passed to a TensorFlow Lite model that classifies the current exercise. The initial implementation focuses on two primary exercises (push-ups and squats), with the ActivityClassifier using majority voting over a sliding window to provide stable classification results.
-\begin{figure}[htbp]
-    
-\end{figure}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/classification_vis_300.png}
-    \caption{Real-time Exercise Classification with Pose Estimation Overlay. The visualization shows the system's ability to detect and track body landmarks during exercise execution. The skeletal overlay (blue lines) connects key joints, while the exercise type is displayed in the upper corner. This real-time feedback helps users understand how the system is interpreting their movements and provides immediate classification results.}
+    \caption{Real-time Exercise Classification with Pose Estimation Overlay}
     \label{fig:classification_vis}
 \end{figure}
 
-Fifth, the RepetitionCounter class implements a state machine approach for each exercise type, tracking transitions between defined states (e.g., "up" and "down" positions). For push-ups, the system monitors elbow angles (90$^\circ$ to 160$^\circ$) and hip alignment (>160$^\circ$ for proper form), while for squats, knee angles (90$^\circ$ to 170$^\circ$) are the primary tracking metric.
-
-Finally, the ExerciseVisualizer renders real-time feedback elements, including a progress bar showing exercise position, repetition counter, form feedback text, and exercise type label. The visualization uses color-coding to provide intuitive feedback: green for progress indicators, red for count numbers, and white backgrounds with colored text for feedback cues.
+As shown in Figure \ref{fig:classification_vis}, the visualization demonstrates the system's ability to detect and track body landmarks during exercise execution. The skeletal overlay (blue lines) connects key joints, while the exercise type is displayed in the upper corner. This real-time feedback helps users understand how the system is interpreting their movements.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/biomechanics_vis_300.png}
-    \caption{Biomechanical Analysis of Exercise Form with Joint Angle Tracking. This figure demonstrates the system's ability to analyze exercise form by measuring critical joint angles. For push-ups, the system monitors elbow angles (shown in green) and hip alignment. For squats, knee angle and torso position are tracked. These angle measurements drive both the repetition counting state machine and form feedback mechanisms, enabling precise assessment of exercise quality.}
+    \caption{Biomechanical Analysis of Exercise Form with Joint Angle Tracking}
     \label{fig:biomechanics_vis}
 \end{figure}
 
-The pipeline operates in real-time, with frame rates between 12-28 FPS depending on hardware capabilities, providing immediate feedback as users perform exercises.
+Figure \ref{fig:biomechanics_vis} demonstrates the system's ability to analyze exercise form by measuring critical joint angles. For push-ups, the system monitors elbow angles (shown in green) and hip alignment. For squats, knee angle and torso position are tracked. These angle measurements drive both the repetition counting state machine and form feedback mechanisms.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/training_history.png}
-    \caption{Model Training and Validation Metrics Over Epochs. This graph shows the progression of model accuracy and loss during training. The steady improvement in validation accuracy (reaching over 90\%) with minimal gap between training and validation curves indicates effective learning without overfitting. The convergence pattern demonstrates that our normalization approach and model architecture successfully capture the essential features of each exercise type while generalizing well to unseen data.}
+    \caption{Model Training and Validation Metrics Over Epochs}
     \label{fig:training_history}
 \end{figure}
+
+The training progress is visualized in Figure \ref{fig:training_history}. The graph shows steady improvement in validation accuracy (reaching over 90\%) with minimal gap between training and validation curves, indicating effective learning without overfitting. The convergence pattern demonstrates that our normalization approach and model architecture successfully capture the essential features.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/classification_metrics.png}
+    \caption{Exercise Classification Performance Metrics by Category}
+    \label{fig:classification_metrics}
+\end{figure}
+
+Figure \ref{fig:classification_metrics} presents precision, recall, and F1-scores for each exercise type. These metrics provide a comprehensive view of classification performance beyond simple accuracy. The high F1-scores for push-ups and squats (above 0.90) demonstrate the system's reliability in recognizing these exercises correctly.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
+    \caption{Confusion Matrix of Exercise Classification Results}
+    \label{fig:confusion_matrix_final}
+\end{figure}
+
+The final confusion matrix in Figure \ref{fig:confusion_matrix_final} shows the relationship between predicted and actual exercise classes. The strong diagonal elements indicate high classification accuracy, while any off-diagonal elements represent misclassifications. The clear distinction between push-ups and squats confirms the system's ability to correctly identify these exercises.
+
+Fifth, the RepetitionCounter class implements a state machine approach for each exercise type, tracking transitions between defined states (e.g., "up" and "down" positions). For push-ups, the system monitors elbow angles (90$^\circ$ to 160$^\circ$) and hip alignment (greater than 160$^\circ$ for proper form), while for squats, knee angles (90$^\circ$ to 170$^\circ$) are the primary tracking metric.
+
+Finally, the ExerciseVisualizer renders real-time feedback elements, including a progress bar showing exercise position, repetition counter, form feedback text, and exercise type label. The visualization uses color-coding to provide intuitive feedback: green for progress indicators, red for count numbers, and white backgrounds with colored text for feedback cues.
+
+The pipeline operates in real-time, with frame rates between 12-28 FPS depending on hardware capabilities, providing immediate feedback as users perform exercises.
 
 \subsection{Contribution/Objectives}
 The primary contributions of this research are:
@@ -906,20 +965,6 @@ E_{\text{cumulative}} = \sum_{t=1}^{T} w_t E_t
 \end{equation}
 
 where $E_t$ is the error at time $t$, and weights $w_t$ are assigned based on the importance of different phases of the exercise.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/classification_metrics.png}
-    \caption{Exercise Classification Performance Metrics by Category. This bar chart presents precision, recall, and F1-scores for each exercise type. These metrics provide a comprehensive view of classification performance beyond simple accuracy. The high F1-scores for push-ups and squats (above 0.90) demonstrate the system's reliability in recognizing these exercises correctly, which is essential for providing accurate form feedback.}
-    \label{fig:classification_metrics}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
-    \caption{Confusion Matrix of Exercise Classification Results. This visualization shows the relationship between predicted and actual exercise classes. The strong diagonal elements indicate high classification accuracy, while any off-diagonal elements would represent misclassifications. The clear distinction between push-ups and squats confirms the system's ability to correctly identify these exercises, which is fundamental to providing exercise-specific form analysis.}
-    \label{fig:confusion_matrix}
-\end{figure}
 
 \section{Implementation}
 
@@ -1029,9 +1074,11 @@ Table 2 presents the statistics of our dataset, showing the number of samples us
 \begin{table}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/class_distribution.png}
-    \caption{Exercise Class Distribution in Training Dataset. This visualization shows the balanced distribution of exercise samples used for training our model. A balanced dataset helps prevent bias toward any particular exercise type and improves generalization across different movements. In our implementation, we focused on push-ups and squats as the primary exercise categories.}
-    \label{fig:class_distribution_detail}
+    \caption{Exercise Class Distribution in Training Dataset}
+    \label{fig:class_distribution}
 \end{table}
+
+Figure \ref{fig:class_distribution} shows the balanced distribution of exercise samples used for training our model. A balanced dataset helps prevent bias toward any particular exercise type and improves generalization across different movements. In our implementation, we focused on push-ups and squats as the primary exercise categories.
 
 \begin{table}[h]
 \caption{Dataset Statistics by Exercise Type}
@@ -1056,9 +1103,11 @@ The average precision, recall, and F1-score across all exercise categories were 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/confusion_matrix.png}
-    \caption{Confusion Matrix of Exercise Classification Performance. The matrix displays the classification accuracy for each exercise type, with darker diagonal elements indicating higher correct classification rates. This visualization helps identify which exercises might be challenging for the model to distinguish. Our system achieves high accuracy in differentiating between push-ups and squats (the main focus of our implementation), with minimal confusion between these categories.}
-    \label{fig:confusion_matrix_detail}
+    \caption{Confusion Matrix of Exercise Classification Performance}
+    \label{fig:confusion_matrix}
 \end{figure}
+
+As demonstrated in Figure \ref{fig:confusion_matrix}, the matrix displays the classification accuracy for each exercise type, with darker diagonal elements indicating higher correct classification rates. This visualization helps identify which exercises might be challenging for the model to distinguish. Our system achieves high accuracy in differentiating between push-ups and squats, with minimal confusion between these categories.
 
 For form analysis, the system achieved an average accuracy of 90.8\% in detecting improper technique. Performance varied by error type, with range of motion and depth errors detected with higher accuracy (greater than 92\%) compared to more subtle errors like asymmetrical movement and flared elbows (85-88\% accuracy). Table 3 presents the detailed form error detection results by exercise type and error category.
 
@@ -1090,11 +1139,11 @@ The training process demonstrated good convergence with the model achieving 88.5
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\textwidth]{images/training_history.png}
-    \caption{Model Training and Validation Metrics Over Epochs. This graph shows the progression of model accuracy and loss during training. The steady improvement in validation accuracy (reaching over 90\%) with minimal gap between training and validation curves indicates effective learning without overfitting. The convergence pattern demonstrates that our normalization approach and model architecture successfully capture the essential features of each exercise type while generalizing well to unseen data.}
+    \caption{Model Training and Validation Metrics Over Epochs}
     \label{fig:training_history}
 \end{figure}
 
-The learning curves show steady improvement without significant overfitting, indicating effective regularization through dropout layers in the network architecture. The feature normalization process contributed significantly to model generalization across different users and environments.
+The training progress is visualized in Figure \ref{fig:training_history}. The graph shows steady improvement in validation accuracy (reaching over 90\%) with minimal gap between training and validation curves, indicating effective learning without overfitting. The convergence pattern demonstrates that our normalization approach and model architecture successfully capture the essential features.
 
 For repetition counting accuracy, the system achieved a mean absolute error (MAE) of 0.42 repetitions across both exercise types, with slightly better performance for squats compared to push-ups. The state machine approach proved effective at handling the transitions between exercise phases, though rapid or partial repetitions occasionally presented challenges for the counter.
 
